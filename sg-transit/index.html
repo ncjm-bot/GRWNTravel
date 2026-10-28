@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#E9EEF4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Bus Timing</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E9EEF4;--card:#fff;--ink:#0F2236;--mute:#6A7B8E;--line:#DCE3EB;--blue:#2450FF;--go:#12926B;--warn:#D98A0B;--stop:#D6402F;
+--f:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}
+html,body{background:var(--bg);color:var(--ink);font:400 16px/1.4 var(--f);-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 32px);max-width:520px;margin:auto}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+.search{position:relative}
+.search input{width:100%;height:54px;border:0;border-radius:27px;background:var(--card);padding:0 22px;font:600 17px var(--f);color:var(--ink);box-shadow:0 1px 0 var(--line),0 12px 28px -18px rgba(15,34,54,.45)}
+.search input::placeholder{color:var(--mute);font-weight:400}
+.results{position:absolute;left:0;right:0;top:62px;background:var(--card);border-radius:22px;box-shadow:0 24px 48px -16px rgba(15,34,54,.35);overflow:hidden;z-index:5}
+.results button{display:block;width:100%;text-align:left;padding:13px 20px;border-bottom:1px solid var(--line)}
+.results button:last-child{border:0}.results b{font-weight:600}.results small{display:block;color:var(--mute)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:16px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:9px 16px;border-radius:20px;background:rgba(15,34,54,.07);font-weight:600;font-size:14px}
+.chip[aria-pressed=true]{background:var(--ink);color:#fff}
+.head{display:flex;align-items:flex-start;gap:12px;margin:26px 4px 18px}
+.head h1{font:800 clamp(28px,8.5vw,38px)/1.02 var(--f);letter-spacing:-.025em;flex:1}
+.head p{color:var(--mute);margin-top:6px;font-size:14px}
+.ibtn{width:46px;height:46px;border-radius:23px;background:var(--card);display:grid;place-items:center;position:relative;box-shadow:0 1px 0 var(--line)}
+.ibtn svg{width:22px;height:22px}
+.ring{position:absolute;inset:0;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:2.5}
+#fav[aria-pressed=true] path{fill:var(--blue);stroke:var(--blue)}
+.spin svg.i{animation:s .7s linear}
+@keyframes s{to{transform:rotate(360deg)}}
+.list{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center;background:var(--card);border-radius:22px;padding:14px 16px 14px 14px;position:relative;box-shadow:0 1px 0 var(--line)}
+.row.pin{box-shadow:inset 4px 0 0 var(--blue),0 1px 0 var(--line)}
+.no{height:56px;border-radius:16px;background:var(--ink);color:#fff;font:800 24px var(--f);letter-spacing:-.02em;display:grid;place-items:center}
+.pin .no{background:var(--blue)}
+.t{display:flex;align-items:baseline;gap:18px}
+.t .a{font:800 40px/1 var(--f);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.t .a i{font:600 14px var(--f);letter-spacing:0;color:var(--mute);font-style:normal;margin-left:3px}
+.t .a.now{color:var(--go)}.t .b{font:600 20px var(--f);color:var(--mute);font-variant-numeric:tabular-nums}
+.meta{display:flex;align-items:center;gap:10px;margin-top:9px;font-size:13px;color:var(--mute)}
+.load{display:flex;gap:3px}.load s{width:16px;height:6px;border-radius:3px;background:var(--line);text-decoration:none}
+.l1 s:nth-child(-n+1){background:var(--go)}.l2 s:nth-child(-n+2){background:var(--warn)}.l3 s{background:var(--stop)}
+.empty{text-align:center;color:var(--mute);padding:64px 24px}
+.empty strong{display:block;color:var(--ink);font:800 26px/1.1 var(--f);letter-spacing:-.02em;margin-bottom:8px}
+.err{background:#fff;border-radius:22px;padding:18px;color:var(--stop);font-weight:600}
+.foot{text-align:center;color:var(--mute);font-size:12px;margin-top:20px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<div class="search">
+  <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="Bus stop code or name" aria-label="Search bus stops">
+  <div class="results" id="res" hidden></div>
+</div>
+<div class="chips" id="chips"></div>
+<div id="stop"></div>
+<script>
+const $=s=>document.querySelector(s),LS=(k,v)=>{try{return v===undefined?JSON.parse(localStorage.getItem(k)):localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}};
+const API='/.netlify/functions/lta',EVERY=30;
+let stops=LS('stops')||[],favs=LS('favs')||[],pins=LS('pins')||{},cur=LS('cur'),data=null,at=0,left=EVERY;
+const name=c=>(stops.find(s=>s[0]===c)||[c,'Bus stop '+c,''])
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function loadStops(){if(stops.length)return;try{stops=await (await fetch(API+'?type=stops')).json();LS('stops',stops)}catch(e){}}
+function chips(){$('#chips').innerHTML=favs.map(c=>`<button class="chip" data-c="${c}" aria-pressed="${c===cur}">${esc(name(c)[1])}</button>`).join('')}
+$('#chips').onclick=e=>{const c=e.target.closest('.chip');if(c)open(c.dataset.c)};
+$('#q').oninput=e=>{const v=e.target.value.trim().toLowerCase(),r=$('#res');if(v.length<2){r.hidden=true;return}
+ const m=stops.filter(s=>s[0].startsWith(v)||s[1].toLowerCase().includes(v)||s[2].toLowerCase().includes(v)).slice(0,8);
+ if(!m.length&&/^\d{5}$/.test(v))m.push([v,'Bus stop '+v,'']);
+ r.hidden=!m.length;r.innerHTML=m.map(s=>`<button data-c="${s[0]}"><b>${esc(s[1])}</b><small>${s[0]} · ${esc(s[2])}</small></button>`).join('')};
+$('#res').onclick=e=>{const b=e.target.closest('button');if(b){$('#q').value='';$('#res').hidden=true;open(b.dataset.c)}};
+function open(c){cur=c;LS('cur',c);data=null;chips();draw();refresh()}
+async function refresh(){if(!cur)return;const b=$('#rf');b&&b.classList.add('spin');left=EVERY;
+ try{const r=await fetch(`${API}?stop=${cur}`);const j=await r.json();if(!r.ok)throw j;data=j.services;at=Date.now()}
+ catch(e){data={error:e&&e.error||'Could not load timings. Check your connection and refresh.'}}
+ draw();setTimeout(()=>{const b=$('#rf');b&&b.classList.remove('spin')},700)}
+const mins=t=>t?Math.max(0,Math.floor((new Date(t)-Date.now())/60000)):null;
+const fmt=m=>m===null?'–':m<=0?'Now':m;
+function draw(){const el=$('#stop');
+ if(!cur){el.innerHTML='<div class="empty"><strong>Where are you waiting?</strong>Search a bus stop code or name to see live timings.</div>';return}
+ const n=name(cur),f=favs.includes(cur);
+ let body='<div class="empty">Loading timings…</div>';
+ if(data&&data.error)body=`<div class="err">${esc(data.error)}</div>`;
+ else if(data){const p=pins[cur]||[];const sv=[...data].sort((a,b)=>(p.includes(b.no)-p.includes(a.no))||a.no.localeCompare(b.no,undefined,{numeric:true}));
+  body=sv.length?'<div class="list">'+sv.map(s=>{const m=s.next.map(x=>x&&mins(x.t)),f0=s.next[0],pn=p.includes(s.no);
+   const ld=f0?{SEA:1,SDA:2,LSD:3}[f0.load]||0:0,lbl=['','Seats available','Standing available','Limited standing'][ld];
+   return `<div class="row${pn?' pin':''}"><button class="no" data-pin="${s.no}" aria-pressed="${pn}" aria-label="Pin service ${s.no}">${s.no}</button><div>
+   <div class="t"><span class="a${m[0]===0?' now':''}">${fmt(m[0])}${m[0]>0?'<i>min</i>':''}</span>${m[1]!=null?`<span class="b">${fmt(m[1])}</span>`:''}${m[2]!=null?`<span class="b">${fmt(m[2])}</span>`:''}</div>
+   ${f0?`<div class="meta"><span class="load l${ld}" aria-hidden="true"><s></s><s></s><s></s></span>${lbl}${f0.dd?' · Double deck':''}${f0.wab?' · Wheelchair':''}</div>`:''}</div></div>`}).join('')+'</div>':'<div class="empty"><strong>No buses right now</strong>Services may have stopped for the night. Refresh to check again.</div>'}
+ el.innerHTML=`<div class="head"><div><h1>${esc(n[1])}</h1><p>${n[0]}${n[2]?' · '+esc(n[2]):''}</p></div>
+ <button class="ibtn" id="fav" aria-pressed="${f}" aria-label="${f?'Remove bookmark':'Bookmark this stop'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z"/></svg></button>
+ <button class="ibtn" id="rf" aria-label="Refresh timings"><svg class="ring" viewBox="0 0 46 46"><circle cx="23" cy="23" r="21" stroke="#DCE3EB"/><circle id="arc" cx="23" cy="23" r="21" stroke="#2450FF" stroke-linecap="round" stroke-dasharray="132" stroke-dashoffset="0"/></svg>
+ <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/></svg></button></div>${body}
+ <p class="foot">${data&&!data.error?'Updated '+new Date(at).toLocaleTimeString('en-SG',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'. Tap a number to pin it.':''}</p>`;
+ $('#fav').onclick=()=>{favs=f?favs.filter(x=>x!==cur):[cur,...favs];LS('favs',favs);chips();draw()};
+ $('#rf').onclick=refresh;
+ el.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>{const p=pins[cur]||[],s=b.dataset.pin;pins[cur]=p.includes(s)?p.filter(x=>x!==s):[...p,s];LS('pins',pins);draw()})}
+setInterval(()=>{if(document.hidden||!cur)return;left--;const a=$('#arc');a&&a.setAttribute('stroke-dashoffset',132*(1-left/EVERY));
+ if(left<=0)refresh();else if(data&&!data.error&&left%10===0)draw()},1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cur&&Date.now()-at>15000)refresh()});
+chips();draw();loadStops();if(cur)refresh();
+</script></body></html>
