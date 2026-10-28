@@ -2,109 +2,106 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#E9EEF4">
+<meta name="theme-color" content="#C8261D">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Bus Timing</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#E9EEF4;--card:#fff;--ink:#0F2236;--mute:#6A7B8E;--line:#DCE3EB;--blue:#2450FF;--go:#12926B;--warn:#D98A0B;--stop:#D6402F;
---f:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif}
+:root{--bg:#0B0D12;--card:#161A22;--hi:#1E2430;--line:#252C3A;--ink:#F2F4F8;--mute:#8A94A6;--red:#E5352B;--bar:#C8261D;--g:#7ED321;--a:#F5A623;--f:Barlow,system-ui,sans-serif;--n:"Barlow Condensed",Barlow,sans-serif}
 *{box-sizing:border-box;margin:0}
-html,body{background:var(--bg);color:var(--ink);font:400 16px/1.4 var(--f);-webkit-tap-highlight-color:transparent}
-body{min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 32px);max-width:520px;margin:auto}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
-.search{position:relative}
-.search input{width:100%;height:54px;border:0;border-radius:27px;background:var(--card);padding:0 22px;font:600 17px var(--f);color:var(--ink);box-shadow:0 1px 0 var(--line),0 12px 28px -18px rgba(15,34,54,.45)}
-.search input::placeholder{color:var(--mute);font-weight:400}
-.results{position:absolute;left:0;right:0;top:62px;background:var(--card);border-radius:22px;box-shadow:0 24px 48px -16px rgba(15,34,54,.35);overflow:hidden;z-index:5}
-.results button{display:block;width:100%;text-align:left;padding:13px 20px;border-bottom:1px solid var(--line)}
-.results button:last-child{border:0}.results b{font-weight:600}.results small{display:block;color:var(--mute)}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:16px 0 4px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;padding:9px 16px;border-radius:20px;background:rgba(15,34,54,.07);font-weight:600;font-size:14px}
-.chip[aria-pressed=true]{background:var(--ink);color:#fff}
-.head{display:flex;align-items:flex-start;gap:12px;margin:26px 4px 18px}
-.head h1{font:800 clamp(28px,8.5vw,38px)/1.02 var(--f);letter-spacing:-.025em;flex:1}
-.head p{color:var(--mute);margin-top:6px;font-size:14px}
-.ibtn{width:46px;height:46px;border-radius:23px;background:var(--card);display:grid;place-items:center;position:relative;box-shadow:0 1px 0 var(--line)}
-.ibtn svg{width:22px;height:22px}
-.ring{position:absolute;inset:0;transform:rotate(-90deg)}
-.ring circle{fill:none;stroke-width:2.5}
-#fav[aria-pressed=true] path{fill:var(--blue);stroke:var(--blue)}
-.spin svg.i{animation:s .7s linear}
-@keyframes s{to{transform:rotate(360deg)}}
-.list{display:grid;gap:10px}
-.row{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center;background:var(--card);border-radius:22px;padding:14px 16px 14px 14px;position:relative;box-shadow:0 1px 0 var(--line)}
-.row.pin{box-shadow:inset 4px 0 0 var(--blue),0 1px 0 var(--line)}
-.no{height:56px;border-radius:16px;background:var(--ink);color:#fff;font:800 24px var(--f);letter-spacing:-.02em;display:grid;place-items:center}
-.pin .no{background:var(--blue)}
-.t{display:flex;align-items:baseline;gap:18px}
-.t .a{font:800 40px/1 var(--f);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
-.t .a i{font:600 14px var(--f);letter-spacing:0;color:var(--mute);font-style:normal;margin-left:3px}
-.t .a.now{color:var(--go)}.t .b{font:600 20px var(--f);color:var(--mute);font-variant-numeric:tabular-nums}
-.meta{display:flex;align-items:center;gap:10px;margin-top:9px;font-size:13px;color:var(--mute)}
-.load{display:flex;gap:3px}.load s{width:16px;height:6px;border-radius:3px;background:var(--line);text-decoration:none}
-.l1 s:nth-child(-n+1){background:var(--go)}.l2 s:nth-child(-n+2){background:var(--warn)}.l3 s{background:var(--stop)}
-.empty{text-align:center;color:var(--mute);padding:64px 24px}
-.empty strong{display:block;color:var(--ink);font:800 26px/1.1 var(--f);letter-spacing:-.02em;margin-bottom:8px}
-.err{background:#fff;border-radius:22px;padding:18px;color:var(--stop);font-weight:600}
-.foot{text-align:center;color:var(--mute);font-size:12px;margin-top:20px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head>
-<body>
-<div class="search">
-  <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="Bus stop code or name" aria-label="Search bus stops">
-  <div class="results" id="res" hidden></div>
-</div>
-<div class="chips" id="chips"></div>
-<div id="stop"></div>
+html,body{background:var(--bg);color:var(--ink);font:400 16px/1.35 var(--f);-webkit-tap-highlight-color:transparent}
+body{max-width:560px;margin:auto;min-height:100vh;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+button,input{font:inherit;color:inherit;background:none;border:0}button{cursor:pointer}
+:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:8px}
+header{position:sticky;top:0;z-index:9;background:var(--bar);padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 12px;display:flex;align-items:center;justify-content:space-between}
+header h1{font:700 26px var(--n);letter-spacing:.01em;flex:1;text-align:center}
+header button{width:44px;height:36px;font-size:20px;position:relative}
+#rf.spin span{display:inline-block;animation:s .7s linear}@keyframes s{to{transform:rotate(360deg)}}
+main{padding:12px}
+.sb{width:100%;height:48px;border-radius:12px;background:var(--card);border:1px solid var(--line);padding:0 16px;margin-bottom:12px;font-size:17px}
+.sb::placeholder{color:var(--mute)}
+.card{background:var(--card);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.top{display:flex;align-items:center;gap:12px;padding:12px 8px 12px 14px}
+.hd{flex:1;text-align:left;display:flex;align-items:center;gap:12px;min-width:0}
+.dist{font-size:12px;color:var(--mute);text-align:center;min-width:44px}
+.dist:before{content:"➤";display:block;color:var(--red);font-size:16px}
+.nm{font:600 19px var(--f);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{color:var(--mute);font-size:14px}.sub b{font-weight:500;color:#aab3c2;margin-right:10px}
+.ic{width:40px;height:40px;font-size:20px;color:var(--mute);border-radius:20px}.ic.on{color:var(--red)}
+.sv{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:6px;padding:11px 14px;border-top:1px solid var(--line);align-items:start}
+.no{text-align:left}.no b{font:700 26px/1 var(--n);display:block;letter-spacing:.01em}
+.no small{color:var(--mute);font-size:12px;display:block;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.no.pin b{color:#5AA2FF}.no.pin b:after{content:" ★";font-size:13px}
+.c b{font:500 22px/1 var(--n);display:block}.c b.now{color:var(--g)}
+.c small{color:var(--mute);font-size:12px;display:block;margin-top:3px;min-height:14px}
+.bar{display:block;height:4px;width:46px;background:#333b4a;border-radius:2px;overflow:hidden;margin-top:5px}
+.bar u{display:block;height:100%}.l1{width:33%;background:var(--g)}.l2{width:66%;background:var(--a)}.l3{width:100%;background:var(--red)}
+.msg{padding:14px;color:var(--mute);font-size:15px}.err{color:#ff8a80}
+.empty{text-align:center;color:var(--mute);padding:48px 24px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--card);border-radius:12px;margin-bottom:10px}
+.row button.pill{background:var(--hi);padding:8px 14px;border-radius:18px;font-weight:600}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav div{display:flex;width:100%;max-width:560px}
+nav button{flex:1;padding:9px 0 10px;color:var(--mute);font-size:12px;font-weight:500}
+nav button span{display:block;font-size:22px;line-height:1.1}nav button[aria-current=page]{color:var(--red)}
+</style></head><body>
+<header><span style="width:44px"></span><h1 id="t">Nearby</h1><button id="rf" aria-label="Refresh"><span>⟳</span></button></header>
+<main><input id="q" class="sb" placeholder="Bus stop code or name" autocomplete="off" hidden><div id="m"></div></main>
+<nav><div id="nav">
+<button data-t="near"><span>◉</span>Nearby</button>
+<button data-t="fav"><span>♥</span>Saved</button>
+<button data-t="search"><span>⌕</span>Search</button>
+<button data-t="set"><span>⚙</span>Settings</button>
+</div></nav>
 <script>
-const $=s=>document.querySelector(s),LS=(k,v)=>{try{return v===undefined?JSON.parse(localStorage.getItem(k)):localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}};
-const API='/.netlify/functions/lta',EVERY=30;
-let stops=LS('stops')||[],favs=LS('favs')||[],pins=LS('pins')||{},cur=LS('cur'),data=null,at=0,left=EVERY;
-const name=c=>(stops.find(s=>s[0]===c)||[c,'Bus stop '+c,''])
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-async function loadStops(){if(stops.length)return;try{stops=await (await fetch(API+'?type=stops')).json();LS('stops',stops)}catch(e){}}
-function chips(){$('#chips').innerHTML=favs.map(c=>`<button class="chip" data-c="${c}" aria-pressed="${c===cur}">${esc(name(c)[1])}</button>`).join('')}
-$('#chips').onclick=e=>{const c=e.target.closest('.chip');if(c)open(c.dataset.c)};
-$('#q').oninput=e=>{const v=e.target.value.trim().toLowerCase(),r=$('#res');if(v.length<2){r.hidden=true;return}
- const m=stops.filter(s=>s[0].startsWith(v)||s[1].toLowerCase().includes(v)||s[2].toLowerCase().includes(v)).slice(0,8);
- if(!m.length&&/^\d{5}$/.test(v))m.push([v,'Bus stop '+v,'']);
- r.hidden=!m.length;r.innerHTML=m.map(s=>`<button data-c="${s[0]}"><b>${esc(s[1])}</b><small>${s[0]} · ${esc(s[2])}</small></button>`).join('')};
-$('#res').onclick=e=>{const b=e.target.closest('button');if(b){$('#q').value='';$('#res').hidden=true;open(b.dataset.c)}};
-function open(c){cur=c;LS('cur',c);data=null;chips();draw();refresh()}
-async function refresh(){if(!cur)return;const b=$('#rf');b&&b.classList.add('spin');left=EVERY;
- try{const r=await fetch(`${API}?stop=${cur}`);const j=await r.json();if(!r.ok)throw j;data=j.services;at=Date.now()}
- catch(e){data={error:e&&e.error||'Could not load timings. Check your connection and refresh.'}}
- draw();setTimeout(()=>{const b=$('#rf');b&&b.classList.remove('spin')},700)}
-const mins=t=>t?Math.max(0,Math.floor((new Date(t)-Date.now())/60000)):null;
-const fmt=m=>m===null?'–':m<=0?'Now':m;
-function draw(){const el=$('#stop');
- if(!cur){el.innerHTML='<div class="empty"><strong>Where are you waiting?</strong>Search a bus stop code or name to see live timings.</div>';return}
- const n=name(cur),f=favs.includes(cur);
- let body='<div class="empty">Loading timings…</div>';
- if(data&&data.error)body=`<div class="err">${esc(data.error)}</div>`;
- else if(data){const p=pins[cur]||[];const sv=[...data].sort((a,b)=>(p.includes(b.no)-p.includes(a.no))||a.no.localeCompare(b.no,undefined,{numeric:true}));
-  body=sv.length?'<div class="list">'+sv.map(s=>{const m=s.next.map(x=>x&&mins(x.t)),f0=s.next[0],pn=p.includes(s.no);
-   const ld=f0?{SEA:1,SDA:2,LSD:3}[f0.load]||0:0,lbl=['','Seats available','Standing available','Limited standing'][ld];
-   return `<div class="row${pn?' pin':''}"><button class="no" data-pin="${s.no}" aria-pressed="${pn}" aria-label="Pin service ${s.no}">${s.no}</button><div>
-   <div class="t"><span class="a${m[0]===0?' now':''}">${fmt(m[0])}${m[0]>0?'<i>min</i>':''}</span>${m[1]!=null?`<span class="b">${fmt(m[1])}</span>`:''}${m[2]!=null?`<span class="b">${fmt(m[2])}</span>`:''}</div>
-   ${f0?`<div class="meta"><span class="load l${ld}" aria-hidden="true"><s></s><s></s><s></s></span>${lbl}${f0.dd?' · Double deck':''}${f0.wab?' · Wheelchair':''}</div>`:''}</div></div>`}).join('')+'</div>':'<div class="empty"><strong>No buses right now</strong>Services may have stopped for the night. Refresh to check again.</div>'}
- el.innerHTML=`<div class="head"><div><h1>${esc(n[1])}</h1><p>${n[0]}${n[2]?' · '+esc(n[2]):''}</p></div>
- <button class="ibtn" id="fav" aria-pressed="${f}" aria-label="${f?'Remove bookmark':'Bookmark this stop'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z"/></svg></button>
- <button class="ibtn" id="rf" aria-label="Refresh timings"><svg class="ring" viewBox="0 0 46 46"><circle cx="23" cy="23" r="21" stroke="#DCE3EB"/><circle id="arc" cx="23" cy="23" r="21" stroke="#2450FF" stroke-linecap="round" stroke-dasharray="132" stroke-dashoffset="0"/></svg>
- <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/></svg></button></div>${body}
- <p class="foot">${data&&!data.error?'Updated '+new Date(at).toLocaleTimeString('en-SG',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'. Tap a number to pin it.':''}</p>`;
- $('#fav').onclick=()=>{favs=f?favs.filter(x=>x!==cur):[cur,...favs];LS('favs',favs);chips();draw()};
- $('#rf').onclick=refresh;
- el.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>{const p=pins[cur]||[],s=b.dataset.pin;pins[cur]=p.includes(s)?p.filter(x=>x!==s):[...p,s];LS('pins',pins);draw()})}
-setInterval(()=>{if(document.hidden||!cur)return;left--;const a=$('#arc');a&&a.setAttribute('stroke-dashoffset',132*(1-left/EVERY));
- if(left<=0)refresh();else if(data&&!data.error&&left%10===0)draw()},1000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cur&&Date.now()-at>15000)refresh()});
-chips();draw();loadStops();if(cur)refresh();
+const API='/.netlify/functions/lta',$=s=>document.querySelector(s);
+const L=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},W=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+let stops=L('stops2',[]),by={},favs=L('favs',[]),pins=L('pins',[]),auto=L('auto',true),tab='near',pos=null,gerr='',arr={},open=new Set(),q='',list=[];
+const T={near:'Nearby',fav:'Saved',search:'Search',set:'Settings'};
+async function api(p){const r=await fetch(API+'?'+p);let j;try{j=await r.json()}catch{throw new Error(r.status==404?'Backend not found (404). Check that netlify.toml and the netlify folder are in your repo.':'Unexpected reply ('+r.status+')')}if(!r.ok)throw new Error(j.error||'Error '+r.status);return j}
+const idx=()=>{by={};stops.forEach(s=>by[s[0]]=s)};idx();
+async function loadStops(){if(stops.length)return;stops=await api('type=stops');W('stops2',stops);idx()}
+function dist(s){if(!pos)return 1e9;const R=6371e3,r=Math.PI/180,a=Math.sin((s[3]-pos.lat)*r/2)**2+Math.cos(pos.lat*r)*Math.cos(s[3]*r)*Math.sin((s[4]-pos.lng)*r/2)**2;return 2*R*Math.asin(Math.sqrt(a))}
+const dtxt=d=>d<1e8?(d<1000?Math.round(d)+'m':(d/1000).toFixed(1)+'km'):'';
+async function getArr(c,force){const a=arr[c];if(!force&&a&&Date.now()-a.at<25e3)return;arr[c]={...a,load:true};try{const j=await api('stop='+c);arr[c]={at:Date.now(),data:j.services}}catch(e){arr[c]={at:Date.now(),err:e.message}}}
+const mins=t=>Math.floor((new Date(t)-Date.now())/6e4);
+const nameOf=c=>by[c]?by[c][1]:'';
+function col(n){if(!n)return'<div class="c"><b>–</b></div>';const m=mins(n.t);return`<div class="c"><b class="${m<=0?'now':''}">${m<=0?'Arr':m}</b><i class="bar"><u class="l${{SEA:1,SDA:2,LSD:3}[n.ld]||1}"></u></i><small>${n.dd?'Double':''}${n.wab?' ♿':''}</small></div>`}
+function card(c){const s=by[c];if(!s)return'';const o=open.has(c),a=arr[c],f=favs.includes(c);let body='';
+ if(o){if(!a||(a.load&&!a.data&&!a.err))body='<div class="msg">Loading timings…</div>';
+ else if(a.err)body=`<div class="msg err">${a.err}</div>`;
+ else if(!a.data.length)body='<div class="msg">No buses running right now.</div>';
+ else body=[...a.data].sort((x,y)=>(pins.includes(y.no)-pins.includes(x.no))||x.no.localeCompare(y.no,'en',{numeric:true})).map(v=>`<div class="sv"><button class="no ${pins.includes(v.no)?'pin':''}" data-pin="${v.no}"><b>${v.no}</b><small>${nameOf(v.to)}</small></button>${v.next.map(col).join('')}</div>`).join('')}
+ return`<div class="card"><div class="top"><button class="hd" data-o="${c}"><span class="dist">${dtxt(dist(s))}</span><span style="min-width:0"><span class="nm" style="display:block">${s[1]}</span><span class="sub"><b>${c}</b>${s[2]}</span></span></button><button class="ic ${f?'on':''}" data-f="${c}" aria-label="Save stop">${f?'♥':'♡'}</button></div>${body}</div>`}
+async function render(){const m=$('#m');$('#t').textContent=T[tab];$('#q').hidden=tab!=='search';
+ document.querySelectorAll('nav button').forEach(b=>b.toggleAttribute('aria-current',b.dataset.t===tab)||b.removeAttribute('aria-current'));
+ document.querySelectorAll('nav button').forEach(b=>b.dataset.t===tab?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+ if(tab==='set'){m.innerHTML=`<div class="row"><span>Auto-refresh every 30s</span><button class="pill" data-a>${auto?'On':'Off'}</button></div><div class="row"><span>Check backend connection</span><button class="pill" data-test>Test</button></div><div class="row"><span>Reload stop list</span><button class="pill" data-clr>Reset</button></div><p class="msg" id="tr"></p>`;return}
+ if(!stops.length){m.innerHTML='<div class="empty">Loading bus stops…</div>';try{await loadStops()}catch(e){m.innerHTML=`<div class="empty err">${e.message}</div>`;return}}
+ if(tab==='near'){if(!pos){m.innerHTML=`<div class="empty">${gerr||'Finding your location…'}</div>`;return}list=[...stops].sort((a,b)=>dist(a)-dist(b)).slice(0,6).map(s=>s[0]);if(!open.size)open.add(list[0])}
+ if(tab==='fav')list=favs;
+ if(tab==='search'){const k=q.trim().toLowerCase();list=!k?[]:/^\d{5}$/.test(k)&&by[k]?[k]:stops.filter(s=>(s[1]+' '+s[2]+' '+s[0]).toLowerCase().includes(k)).slice(0,10).map(s=>s[0])}
+ if(!list.length){m.innerHTML=`<div class="empty">${tab==='fav'?'Tap ♡ on a stop to save it here.':tab==='search'?(q?'No stops found.':'Search by stop code or name.'):''}</div>`;return}
+ m.innerHTML=list.map(card).join('');
+ const need=list.filter(c=>open.has(c)&&(!arr[c]||!(arr[c].data||arr[c].err)));if(need.length){await Promise.all(need.map(c=>getArr(c)));m.innerHTML=list.map(card).join('')}}
+async function refresh(){const b=$('#rf');b.classList.add('spin');if(tab==='near'&&!pos)locate();if(list.length)await Promise.all(list.filter(c=>open.has(c)).map(c=>getArr(c,true)));if(tab!=='set'&&!$('#m').querySelector('.empty'))$('#m').innerHTML=list.map(card).join('');setTimeout(()=>b.classList.remove('spin'),700)}
+function locate(){if(!navigator.geolocation){gerr='Location is not supported on this device.';return render()}navigator.geolocation.getCurrentPosition(p=>{pos={lat:p.coords.latitude,lng:p.coords.longitude};render()},()=>{gerr='Allow location access to see stops near you, or use Search.';render()},{enableHighAccuracy:true,timeout:15000,maximumAge:3e4})}
+document.addEventListener('click',async e=>{const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.t){tab=t.dataset.t;if(tab==='near'&&!pos)locate();scrollTo(0,0);return render()}
+ if(t.id==='rf')return refresh();
+ if(t.dataset.o){const c=t.dataset.o;open.has(c)?open.delete(c):open.add(c);return render()}
+ if(t.dataset.f){const c=t.dataset.f;favs=favs.includes(c)?favs.filter(x=>x!==c):[...favs,c];W('favs',favs);return render()}
+ if(t.dataset.pin){const n=t.dataset.pin;pins=pins.includes(n)?pins.filter(x=>x!==n):[...pins,n];W('pins',pins);return render()}
+ if(t.dataset.a!==undefined){auto=!auto;W('auto',auto);return render()}
+ if(t.dataset.clr!==undefined){stops=[];W('stops2',[]);return render()}
+ if(t.dataset.test!==undefined){const o=$('#tr');o.className='msg';o.textContent='Testing…';try{const j=await api('stop=44229');o.textContent='Working. Got '+j.services.length+' services at stop 44229.'}catch(x){o.className='msg err';o.textContent=x.message}}});
+$('#q').addEventListener('input',e=>{q=e.target.value;const k=q.trim();if(/^\d{5}$/.test(k))open.add(k);render()});
+setInterval(()=>{if(auto&&!document.hidden)refresh()},3e4);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&auto)refresh()});
+locate();render();
 </script></body></html>
